@@ -10,6 +10,9 @@ SIGNIN -> uName
 
 SEND -> uName/groupName
 		Message
+		
+MESSAGE -> message
+		   sender
 
 JOIN -> GROUP_NAME <- Key
 
@@ -19,9 +22,6 @@ CREATE -> GROUP_NAME <- Key
 
 KEY -> GROUP_NAME
 	   key
-
-MESSAGE -> message
-		   sender
 
 GROUP_LIST -> groups
 		      participants
