@@ -3,7 +3,11 @@ class UserManager(object):
     self.users = {}
 
   def addUser(self, userName, password):
-    self.users[userName] = password
+    if(userName in self.users.keys()):
+      return "UserAlreadyExist"
+    else:
+      self.users[userName] = password
+      return "UserAdded"
     print(self.users)
 
   def authUser(self, userName, password):

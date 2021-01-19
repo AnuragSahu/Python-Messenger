@@ -9,6 +9,8 @@ class MessageHandler(object):
             self.processSignUpCommand(client, splittedMessage[1])
         elif(command == 'SIGNIN'):
             self.processSignInCommand(client, splittedMessage[1])
+        # elif(command == "SEND"):
+        #     self.processSendCommand(client, splittedMessage[1])
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -20,9 +22,12 @@ class MessageHandler(object):
         elif(len(args) > 2):
             self.sendErrorMessage(client, "SignUp:: user name and password should not contain spaces")
         else:
-            userMannager.addUser(args[0], args[1])
-            clientManager.addClient(client, args[0])
-            self.sendLoggedInMessage(client, args[0])
+            getInfo = userMannager.addUser(args[0], args[1])
+            if(getInfo == "UserAlreadyExist"):
+                self.sendErrorMessage(client, "SignUp:: Username already Exists, Try another Username")
+            elif(getInfo == "UserAdded"):
+                clientManager.addClient(client, args[0])
+                self.sendLoggedInMessage(client, args[0])
 
     def processSignInCommand(self, client, argsString):
         from ClientManager import clientManager
@@ -40,6 +45,14 @@ class MessageHandler(object):
             elif( getInfo == "LogIn"):
                 clientManager.addClient(client, args[0])
                 self.sendLoggedInMessage(client, args[0])
+
+    # def processSendCommand(self, client, argsString):
+    #     from ClientManager import clientManager
+    #     args = argsString.split()
+    #     if(len(args) < 2):
+    #         self.sendErrorMessage(client, "Send:: Please provide client name and Message")
+    #     else:
+    #         getInfo = userMannager.authUser(args[0], args[1])
             
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
