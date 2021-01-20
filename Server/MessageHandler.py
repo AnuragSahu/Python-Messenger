@@ -9,8 +9,8 @@ class MessageHandler(object):
             self.processSignUpCommand(client, splittedMessage[1])
         elif(command == 'SIGNIN'):
             self.processSignInCommand(client, splittedMessage[1])
-        # elif(command == "SEND"):
-        #     self.processSendCommand(client, splittedMessage[1])
+        elif(command == 'SEND'):
+            self.processSendCommand(client, splittedMessage[1])
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -46,18 +46,29 @@ class MessageHandler(object):
                 clientManager.addClient(client, args[0])
                 self.sendLoggedInMessage(client, args[0])
 
-    # def processSendCommand(self, client, argsString):
-    #     from ClientManager import clientManager
-    #     args = argsString.split()
-    #     if(len(args) < 2):
-    #         self.sendErrorMessage(client, "Send:: Please provide client name and Message")
-    #     else:
-    #         getInfo = userMannager.authUser(args[0], args[1])
+    def processSendCommand(self, client, argsString):
+        from ClientManager import clientManager
+        args = argsString.split()
+        if(len(args) < 2):
+            self.sendErrorMessage(client, "Send:: Please provide client name and Message")
+        else:
+            getInfo = userMannager.getUserInfo(args[0])
+            if(getInfo == "NoSuchUser"):
+                self.sendErrorMessage(client, "Send:: User with name : " + args[0])
+            else:
+                senderName = clientManager.getClientName(client)
+                message = args[1]
+                reciever_client = clientManager.getClient(args[0])
+                self.sendMessage(reciever_client, senderName, message)
+            
             
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
 
     def sendLoggedInMessage(self, client, userName):
       messageSender.send(client, "LOGIN_SUCCESS", "LoggedIn successfully:: " + userName)
+
+    def sendMessage(self, client, senderName, message):
+        messageSender.send(client, "MESSAGE", senderName + ": " + message)
 
 messageHandler = MessageHandler()

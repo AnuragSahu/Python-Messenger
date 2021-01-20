@@ -20,5 +20,17 @@ class ClientManager(object):
     def addClient(self, client, userName):
         self.clients[userName] = client
 
+    def getClient(self, userName):
+        return self.clients[userName]
+
+    def getClientName(self, client):
+        userNameList = list(self.clients.keys())
+        clientsList = list(self.clients.values())
+
+        position = clientsList.index(client)
+        userName = userNameList[position]
+
+        return userName
+
 
 clientManager = ClientManager()
