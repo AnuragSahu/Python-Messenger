@@ -12,6 +12,8 @@ class MessageHandler():
             self.processLogInSuccessResponse(socket, splittedMessage[1])
         elif(command == 'ERROR'):
             self.processMessage(socket, splittedMessage[1])
+        elif(command == 'MESSAGE'):
+            self.processMessage(socket, splittedMessage[1])
         else:
             self.processMessage(socket, "Unknown response")
 
