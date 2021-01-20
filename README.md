@@ -10,15 +10,17 @@ SIGNIN -> uName
 
 SEND -> uName/groupName
 		Message
+
+SIGNIN_ERROR -> error_message
 		
 MESSAGE -> message
 		   sender
 
+CREATE -> GROUP_NAME <- Key
+
 JOIN -> GROUP_NAME <- Key
 
 LIST
-
-CREATE -> GROUP_NAME <- Key
 
 KEY -> GROUP_NAME
 	   key
@@ -26,6 +28,6 @@ KEY -> GROUP_NAME
 GROUP_LIST -> groups
 		      participants
 
-SIGNIN_ERROR -> error_message
+
 
 ERROR -> error_message

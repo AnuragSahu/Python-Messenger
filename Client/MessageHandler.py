@@ -14,11 +14,20 @@ class MessageHandler():
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'MESSAGE'):
             self.processMessage(socket, splittedMessage[1])
+        elif(command == 'GROUP_CREATED'):
+            self.processMessage(socket, splittedMessage[1])
+        elif(command == 'GROUP_LIST'):
+            self.processMessage(socket, splittedMessage[1])
+        elif(command == 'GROUP_JOIN'):
+            self.processgoupJoinSuccessResponse(socket, splittedMessage[1])
         else:
             self.processMessage(socket, "Unknown response")
 
     def processLogInSuccessResponse(self, socket, argsString):
         sessionInfo.updateLoggedInStatus(True)
+        self.processMessage(socket, argsString)
+
+    def processgoupJoinSuccessResponse(self, socket, argsString):
         self.processMessage(socket, argsString)
 
     def processMessage(self, socket, argsString):
