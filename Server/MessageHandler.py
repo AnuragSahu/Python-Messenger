@@ -1,6 +1,7 @@
 from MessageSender import messageSender
 from UserManager import userMannager
 from Command import Commands
+import json
 
 
 class MessageHandler(object):
@@ -28,17 +29,21 @@ class MessageHandler(object):
     def processSignUpCommand(self, client, argsString):
         from ClientManager import clientManager
         args = argsString.split()
-        if(len(args) < 2):
+        if(len(args) < 3):
             self.sendErrorMessage(client, "SignUp:: please provide user name and password")
-        elif(len(args) > 2):
+        elif(len(args) > 3):
             self.sendErrorMessage(client, "SignUp:: user name and password should not contain spaces")
         else:
-            getInfo = userMannager.addUser(args[0], args[1])
+            getInfo = userMannager.addUser(args[0], args[1], args[2])
             if(getInfo == "UserAlreadyExist"):
                 self.sendErrorMessage(client, "SignUp:: Username already Exists, Try another Username")
             elif(getInfo == "UserAdded"):
                 clientManager.addClient(client, args[0])
                 self.sendLoggedInMessage(client, args[0])
+                allClients = clientManager.getAllClients()
+                publicKeys = userMannager.getPublicKeys()
+                print(allClients, publicKeys)
+                messageSender.broadCast(allClients, "PUBLIC_KEYS", json.dumps(publicKeys))
 
     def processSignInCommand(self, client, argsString):
         from ClientManager import clientManager

@@ -1,19 +1,22 @@
 class UserManager(object):
   def __init__(self):
     self.users = {}
+    self.userPublicKeys = {}
 
-  def addUser(self, userName, password):
+  def addUser(self, userName, password, publicKey):
     if(userName in self.users.keys()):
       return "UserAlreadyExist"
     else:
       self.users[userName] = password
+      self.userPublicKeys[userName] = publicKey
       print(self.users)
+      print(self.userPublicKeys)
       return "UserAdded"
     
 
   def authUser(self, userName, password):
     if(userName in self.users.keys()):
-      if(self.users[userName] == password):
+      if(self.users[userName][0] == password):
         return "LogIn"
       else:
         return "WrongPassword"
@@ -25,5 +28,8 @@ class UserManager(object):
       return "UserExists"
     else:
       return "NoSuchUser"
+
+  def getPublicKeys(self):
+    return self.userPublicKeys
 
 userMannager = UserManager()

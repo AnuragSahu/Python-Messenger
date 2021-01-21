@@ -23,6 +23,9 @@ class ClientManager(object):
     def getClient(self, userName):
         return self.clients[userName]
 
+    def getAllClients(self):
+        return self.clients.values()
+
     def getClientName(self, client):
         userNameList = list(self.clients.keys())
         clientsList = list(self.clients.values())
