@@ -23,6 +23,10 @@ class MessageHandler(object):
             self.processListCommand(client)
         elif(command == 'JOIN'):
             self.processJoinCommand(client, splittedMessage[1].strip())
+        elif(command == 'SENDER_PARTIAL_KEY'):
+            self.processSenderPartialKeyCommand(client, splittedMessage[1].strip())
+        elif(command == 'RECEIVER_PARTIAL_KEY'):
+            self.processReceiverPartialKeyCommand(client, splittedMessage[1].strip())
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -102,6 +106,20 @@ class MessageHandler(object):
         groupManager.joinGroup(userName, groupName)
         self.sendGroupJoinMessage(client, groupName)
             
+    def processSenderPartialKeyCommand(self, sClient, argsString):
+        from ClientManager import clientManager
+        rUserName, key = argsString.split()
+        sUserName = clientManager.getClientName(sClient)
+        rClient = clientManager.getClient(rUserName)
+        messageSender.send(rClient, "SENDER_PARTIAL_KEY", sUserName + " " + key)
+
+    def processReceiverPartialKeyCommand(self, sClient, argsString):
+        from ClientManager import clientManager
+        rUserName, key = argsString.split()
+        sUserName = clientManager.getClientName(sClient)
+        rClient = clientManager.getClient(rUserName)
+        messageSender.send(rClient, "RECEIVER_PARTIAL_KEY", sUserName + " " + key)
+
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
 

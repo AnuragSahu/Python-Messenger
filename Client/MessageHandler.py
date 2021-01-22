@@ -1,11 +1,13 @@
 from UserInput import userInput
 from SessionInfo import sessionInfo
 import json
+from DiffieHellman import diffieHellman
+from MessageSender import messageSender
 
 
 class MessageHandler():
     def handle_message(self, socket, message):
-        print("Recieved : "+ message)
+        print("Recieved : " + message)
         splittedMessage = message.split(maxsplit=1)
         command = splittedMessage[0]
         if(command == 'GREETING'):
@@ -21,17 +23,21 @@ class MessageHandler():
         elif(command == 'GROUP_LIST'):
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_JOIN'):
-            self.processgoupJoinSuccessResponse(socket, splittedMessage[1])
+            self.processGroupJoinSuccessResponse(socket, splittedMessage[1])
         elif(command == 'PUBLIC_KEYS'):
             self.processPublicKeysResponse(socket, splittedMessage[1])
+        elif(command == 'SENDER_PARTIAL_KEY'):
+            self.processSenderPartialKeyCommand(socket, splittedMessage[1])
+        elif(command == 'RECEIVER_PARTIAL_KEY'):
+            self.processReceiverPartialKeyCommand(socket, splittedMessage[1])
         else:
             self.processMessage(socket, "Unknown response")
 
     def processLogInSuccessResponse(self, socket, argsString):
-        sessionInfo.updateLoggedInStatus(True)
+        sessionInfo.updateLoggedInStatus(True, argsString.split()[-1])
         print(argsString)
 
-    def processgoupJoinSuccessResponse(self, socket, argsString):
+    def processGroupJoinSuccessResponse(self, socket, argsString):
         self.processMessage(socket, argsString)
 
     def processMessage(self, socket, argsString):
@@ -41,7 +47,21 @@ class MessageHandler():
     def processPublicKeysResponse(self, socket, argsString):
         publicKeys = json.loads(argsString)
         sessionInfo.setPublicKeys(publicKeys)
+        diffieHellman.updatePartialKeys(
+            sessionInfo.privateKey, sessionInfo.publicKeys, sessionInfo.userName)
         userInput.takeUserInput(socket)
+
+    def processSenderPartialKeyCommand(self, socket, argsString):
+        sUserName, key = argsString.split()
+        diffieHellman.addFullKey(
+            sUserName, key, sessionInfo.publicKeys[sUserName], sessionInfo.privateKey)
+        messageSender.send(socket, "RECEIVER_PARTIAL_KEY" + " " +
+                           sUserName + " " + diffieHellman.partialKeys[sUserName])
+
+    def processReceiverPartialKeyCommand(self, socket, argsString):
+        sUserName, key = argsString.split()
+        diffieHellman.addFullKey(
+            sUserName, key, sessionInfo.publicKeys[sUserName], sessionInfo.privateKey)
 
 
 messageHandler = MessageHandler()

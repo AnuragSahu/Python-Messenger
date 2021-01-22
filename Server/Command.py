@@ -7,3 +7,4 @@ class Commands(enum.Enum):
    CREATE = 1
    JOIN = 1
    LIST = 0
+   PARTIAL_KEY = 1
