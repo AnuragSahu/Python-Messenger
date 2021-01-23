@@ -30,6 +30,7 @@ class UserInput(object):
 
     def sharePartialKey(self, socket, rUserName):
         if(rUserName not in diffieHellman.fullKeys.keys()):
+            diffieHellman.calculatePartialKey(sessionInfo.privateKey, sessionInfo.publicKeys, sessionInfo.userName, rUserName)
             messageSender.send(socket, "SENDER_PARTIAL_KEY" + " " + rUserName + " " + str(diffieHellman.partialKeys[rUserName]))
 
 userInput = UserInput()

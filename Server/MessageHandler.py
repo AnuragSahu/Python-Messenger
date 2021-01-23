@@ -126,7 +126,6 @@ class MessageHandler(object):
     def sendLoggedInMessage(self, client, userName):
       messageSender.send(client, "LOGIN_SUCCESS", "LoggedIn successfully:: " + userName)
 
-
     def sendGroupCreatedMessage(self, client, groupName):
         messageSender.send(client, "GROUP_CREATED", "Group created successfully:: " + groupName)
 

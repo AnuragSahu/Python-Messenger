@@ -47,16 +47,16 @@ class MessageHandler():
     def processPublicKeysResponse(self, socket, argsString):
         publicKeys = json.loads(argsString)
         sessionInfo.setPublicKeys(publicKeys)
-        diffieHellman.updatePartialKeys(
-            sessionInfo.privateKey, sessionInfo.publicKeys, sessionInfo.userName)
         userInput.takeUserInput(socket)
 
     def processSenderPartialKeyCommand(self, socket, argsString):
         sUserName, key = argsString.split()
+        diffieHellman.updatePartialKey(
+            sessionInfo.privateKey, sessionInfo.publicKeys, sessionInfo.userName, sUserName)
         diffieHellman.addFullKey(
-            sUserName, key, sessionInfo.publicKeys[sUserName], sessionInfo.privateKey)
+            sUserName, key, sessionInfo.publicKeys[sessionInfo.userName], sessionInfo.privateKey)
         messageSender.send(socket, "RECEIVER_PARTIAL_KEY" + " " +
-                           sUserName + " " + diffieHellman.partialKeys[sUserName])
+                           sUserName + " " + str(diffieHellman.partialKeys[sUserName]))
 
     def processReceiverPartialKeyCommand(self, socket, argsString):
         sUserName, key = argsString.split()
