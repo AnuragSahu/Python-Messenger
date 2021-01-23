@@ -2,11 +2,13 @@ from MessageSender import messageSender
 from UserManager import userMannager
 from Command import Commands
 import json
+import time
 
 
 class MessageHandler(object):
 
     def handle_message(self, client, message):
+        print("Recieved : " + message)
         splittedMessage = message.split(maxsplit=1)
         command = splittedMessage[0]
         if(len(splittedMessage) < Commands[command].value + 1):
@@ -23,6 +25,10 @@ class MessageHandler(object):
             self.processListCommand(client)
         elif(command == 'JOIN'):
             self.processJoinCommand(client, splittedMessage[1].strip())
+        elif(command == 'SENDER_PARTIAL_KEY'):
+            self.processSenderPartialKeyCommand(client, splittedMessage[1].strip())
+        elif(command == 'RECEIVER_PARTIAL_KEY'):
+            self.processReceiverPartialKeyCommand(client, splittedMessage[1].strip())
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -42,7 +48,7 @@ class MessageHandler(object):
                 self.sendLoggedInMessage(client, args[0])
                 allClients = clientManager.getAllClients()
                 publicKeys = userMannager.getPublicKeys()
-                print(allClients, publicKeys)
+                time.sleep(1) # wait for 1 sec
                 messageSender.broadCast(allClients, "PUBLIC_KEYS", json.dumps(publicKeys))
 
     def processSignInCommand(self, client, argsString):
@@ -102,18 +108,31 @@ class MessageHandler(object):
         groupManager.joinGroup(userName, groupName)
         self.sendGroupJoinMessage(client, groupName)
             
+    def processSenderPartialKeyCommand(self, sClient, argsString):
+        from ClientManager import clientManager
+        rUserName, key = argsString.split()
+        sUserName = clientManager.getClientName(sClient)
+        rClient = clientManager.getClient(rUserName)
+        messageSender.send(rClient, "SENDER_PARTIAL_KEY", sUserName + " " + key)
+
+    def processReceiverPartialKeyCommand(self, sClient, argsString):
+        from ClientManager import clientManager
+        rUserName, key = argsString.split()
+        sUserName = clientManager.getClientName(sClient)
+        rClient = clientManager.getClient(rUserName)
+        messageSender.send(rClient, "RECEIVER_PARTIAL_KEY", sUserName + " " + key)
+
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
 
     def sendLoggedInMessage(self, client, userName):
       messageSender.send(client, "LOGIN_SUCCESS", "LoggedIn successfully:: " + userName)
 
-
     def sendGroupCreatedMessage(self, client, groupName):
         messageSender.send(client, "GROUP_CREATED", "Group created successfully:: " + groupName)
 
     def sendMessage(self, client, senderName, message):
-        messageSender.send(client, "MESSAGE", senderName + ": " + message)
+        messageSender.send(client, "MESSAGE", senderName + " " + message)
 
     def sendGroupList(self, client, group_list):
         messageSender.send(client, "GROUP_LIST", group_list)
