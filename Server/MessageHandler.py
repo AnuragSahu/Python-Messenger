@@ -2,11 +2,13 @@ from MessageSender import messageSender
 from UserManager import userMannager
 from Command import Commands
 import json
+import time
 
 
 class MessageHandler(object):
 
     def handle_message(self, client, message):
+        print("Recieved : " + message)
         splittedMessage = message.split(maxsplit=1)
         command = splittedMessage[0]
         if(len(splittedMessage) < Commands[command].value + 1):
@@ -46,7 +48,7 @@ class MessageHandler(object):
                 self.sendLoggedInMessage(client, args[0])
                 allClients = clientManager.getAllClients()
                 publicKeys = userMannager.getPublicKeys()
-                print(allClients, publicKeys)
+                time.sleep(1) # wait for 1 sec
                 messageSender.broadCast(allClients, "PUBLIC_KEYS", json.dumps(publicKeys))
 
     def processSignInCommand(self, client, argsString):
@@ -130,7 +132,7 @@ class MessageHandler(object):
         messageSender.send(client, "GROUP_CREATED", "Group created successfully:: " + groupName)
 
     def sendMessage(self, client, senderName, message):
-        messageSender.send(client, "MESSAGE", senderName + ": " + message)
+        messageSender.send(client, "MESSAGE", senderName + " " + message)
 
     def sendGroupList(self, client, group_list):
         messageSender.send(client, "GROUP_LIST", group_list)

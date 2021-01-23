@@ -1,5 +1,6 @@
 class SessionInfo(object):
     def __init__(self):
+        self.socket = None
         self.userName = ""
         self.isLoggedIn = False
         self.publickey = 0
@@ -18,5 +19,8 @@ class SessionInfo(object):
         for key in keys:
             self.publicKeys[key] = int(keys[key])
         print(self.publicKeys)
+
+    def setSocket(self, socket):
+        self.socket = socket
 
 sessionInfo = SessionInfo()

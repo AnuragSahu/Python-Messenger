@@ -3,6 +3,7 @@ class MessageSender(object):
         self.send(client, 'ERROR', errorMessage)
 
     def send(self, client, command, data):
+        print("Sending : " + command + " " + data)
         client.send(bytes(command + " " + data, "utf8"))
 
     def broadCast(self, clients, command, data):

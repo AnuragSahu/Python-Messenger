@@ -3,6 +3,8 @@ from SessionInfo import sessionInfo
 import json
 from DiffieHellman import diffieHellman
 from MessageSender import messageSender
+import binascii
+import pyDes
 
 
 class MessageHandler():
@@ -17,7 +19,7 @@ class MessageHandler():
         elif(command == 'ERROR'):
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'MESSAGE'):
-            self.processMessage(socket, splittedMessage[1])
+            self.processRecievedMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_CREATED'):
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_LIST'):
@@ -42,6 +44,15 @@ class MessageHandler():
 
     def processMessage(self, socket, argsString):
         print(argsString)
+        userInput.takeUserInput(socket)
+
+    def processRecievedMessage(self, socket, argsString):
+        args = argsString.split(maxsplit = 1)
+        fullKey = diffieHellman.fullKeys[args[0]]
+        encryptObject = pyDes.triple_des(fullKey, padmode = pyDes.PAD_PKCS5)
+        decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(args[1]), padmode = pyDes.PAD_PKCS5)
+        message =  decryptedMessage.decode(encoding='utf-8') 
+        print(args[0] + " : " + message)
         userInput.takeUserInput(socket)
 
     def processPublicKeysResponse(self, socket, argsString):
