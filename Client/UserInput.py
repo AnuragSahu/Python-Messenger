@@ -69,7 +69,7 @@ class UserInput(object):
         l = f.read(Constants.FILE_BUFFER)
         while(l):
             l = binascii.b2a_hex(l).decode(encoding='utf-8')
-            #l = self.encryptMessage([groupName,l])
+            l = self.encryptGroupMessage(groupName, l)
             messageSender.send(client, "GROUP_FILEBUFFER " + groupName + " " + l)
             l = f.read(Constants.FILE_BUFFER)
             time.sleep(0.1) #1s

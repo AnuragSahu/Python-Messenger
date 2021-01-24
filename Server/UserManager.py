@@ -16,7 +16,7 @@ class UserManager(object):
 
   def authUser(self, userName, password):
     if(userName in self.users.keys()):
-      if(self.users[userName][0] == password):
+      if(self.users[userName] == password):
         return "LogIn"
       else:
         return "WrongPassword"

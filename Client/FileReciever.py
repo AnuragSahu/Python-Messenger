@@ -19,7 +19,9 @@ class FileReciever(object):
 
     def closeFile(self):
         self.file.close()
+        filePath = self.sUserName+"/"+self.fileName
         self.fileName = None
         self.file = None
+        return filePath 
 
 fileReciever = FileReciever()

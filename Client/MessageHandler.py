@@ -103,7 +103,6 @@ class MessageHandler():
 
     def processFilePathResponse(self, socket, argsString):
         args = argsString.split(maxsplit=1)
-        rUserName = sessionInfo.userName
         fileReciever.createFile(args[0], args[1])
         print("Recieving file "+args[1]+" from "+args[0])
 
@@ -118,8 +117,8 @@ class MessageHandler():
             buffer = binascii.a2b_hex(buffer)
             fileReciever.writeFile(buffer)
         else:
-            fileReciever.closeFile()
-            self.processMessage(socket, "File Recived, Ready to take input")
+            filePath = fileReciever.closeFile()
+            self.processMessage(socket, "File Recived at "+filePath)
 
     def processGroupFileBufferResponse(self, socket, argsString):
         args = argsString.split(maxsplit=2)
@@ -127,16 +126,15 @@ class MessageHandler():
         #sUserName = args[1]
         buffer = args[2]
         if(buffer != "EOF"):
-            #fullKey = diffieHellman.fullKeys[sUserName]
-            #encryptObject = pyDes.triple_des(fullKey, padmode = pyDes.PAD_PKCS5)
-            #decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(buffer), padmode = pyDes.PAD_PKCS5)
-            #buffer =  decryptedMessage.decode(encoding='utf-8') 
-            #print(buffer)
+            groupKey = sessionInfo.groupKeys[groupName]
+            encryptObject = pyDes.triple_des(groupKey, padmode = pyDes.PAD_PKCS5)
+            decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(buffer), padmode = pyDes.PAD_PKCS5)
+            buffer =  decryptedMessage.decode(encoding='utf-8')
             buffer = binascii.a2b_hex(buffer)
             fileReciever.writeFile(buffer)
         else:
-            fileReciever.closeFile()
-            self.processMessage(socket, "File Recived, Ready to take input")
+            filePath = fileReciever.closeFile()
+            self.processMessage(socket, "File Recived at "+filePath)
     
     def processGroupFilePathResponse(self, socket, argsString):
         args = argsString.split(maxsplit=2)
