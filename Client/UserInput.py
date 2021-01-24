@@ -43,6 +43,12 @@ class UserInput(object):
             groupName, message =  argsString.split(maxsplit=2)[1:]
             encryptedMessage = self.encryptGroupMessage(groupName, message)
             messageSender.send(socket, "GROUP_SEND " + groupName + " " + encryptedMessage)
+        elif(command == "GROUP_SEND_FILE"):
+            groupName, filePath =  argsString.split(maxsplit=2)[1:]
+            fileName = filePath.split("/")[-1]
+            messageSender.send(socket, "GROUP_SEND_FILE_PATH " + groupName + " " + fileName)
+            time.sleep(1)
+            self.groupSendFile(socket, groupName, filePath)
         else:
             messageSender.send(socket, argsString)
 
@@ -54,9 +60,21 @@ class UserInput(object):
             l = self.encryptMessage([rUserName,l])
             messageSender.send(client, "FILEBUFFER " + rUserName + " " + l)
             l = f.read(Constants.FILE_BUFFER)
-            time.sleep(1) #1s
+            time.sleep(0.1) #1s
         f.close()
         messageSender.send(client, "FILEBUFFER "+rUserName+" EOF")
+
+    def groupSendFile(self, client, groupName, filePath):
+        f = open(filePath,'rb')
+        l = f.read(Constants.FILE_BUFFER)
+        while(l):
+            l = binascii.b2a_hex(l).decode(encoding='utf-8')
+            #l = self.encryptMessage([groupName,l])
+            messageSender.send(client, "GROUP_FILEBUFFER " + groupName + " " + l)
+            l = f.read(Constants.FILE_BUFFER)
+            time.sleep(0.1) #1s
+        f.close()
+        messageSender.send(client, "GROUP_FILEBUFFER "+groupName+" EOF")
 
     def generateKeys(self):
         # TODO

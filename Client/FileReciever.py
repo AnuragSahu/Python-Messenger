@@ -1,3 +1,4 @@
+import os
 class FileReciever(object):
     def __init__(self):
         self.fileName = None
@@ -7,7 +8,11 @@ class FileReciever(object):
     def createFile(self, sUsername, fileName):
         self.fileName = fileName
         self.sUserName = sUsername
-        self.file = open(self.fileName, 'wb')
+        try: 
+            os.makedirs(self.sUserName)
+        except OSError:
+            pass
+        self.file = open(self.sUserName+"/"+self.fileName, 'wb')
 
     def writeFile(self, buffer):
         self.file.write(buffer)

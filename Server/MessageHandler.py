@@ -33,8 +33,12 @@ class MessageHandler(object):
             self.processReceiverPartialKeyCommand(client, splittedMessage[1].strip())
         elif(command == 'SEND_FILE_PATH'):
             self.processSendFilePathCommand(client, splittedMessage[1].strip())
+        elif(command == 'GROUP_SEND_FILE_PATH'):
+            self.processGroupSendFilePathCommand(client, splittedMessage[1].strip())
         elif(command == 'FILEBUFFER'):
             self.processFileBufferCommand(client, splittedMessage[1].strip())
+        elif(command == 'GROUP_FILEBUFFER'):
+            self.processGroupFileBufferCommand(client, splittedMessage[1].strip())
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -155,6 +159,34 @@ class MessageHandler(object):
         buffer = args[1]
         rClient = clientManager.getClient(rUserName)
         messageSender.send(rClient, "FILEBUFFER", buffer)
+    
+    def processGroupSendFilePathCommand(self, client, argsString):
+        from ClientManager import clientManager
+        from GroupManager import groupManager
+        args = argsString.split(maxsplit = 1)
+        groupName = args[0]
+        fileName = args[1]
+
+        sUserName = clientManager.getClientName(client)
+        listOfParticipants = groupManager.getParticipants(groupName)
+        socketOfParticipants = clientManager.getClients(listOfParticipants)
+        socketOfParticipants.remove(client)
+        messageSender.broadCast(
+            socketOfParticipants,"GROUP_SEND_FILE_PATH", groupName + " " + sUserName + " " + fileName)
+
+    def processGroupFileBufferCommand(self, client, argsString):
+        from ClientManager import clientManager
+        from GroupManager import groupManager
+        args = argsString.split(maxsplit = 1)
+        groupName = args[0]
+        buffer = args[1]
+        sUserName = clientManager.getClientName(client)
+        listOfParticipants = groupManager.getParticipants(groupName)
+        socketOfParticipants = clientManager.getClients(listOfParticipants)
+        socketOfParticipants.remove(client)
+        messageSender.broadCast(
+            socketOfParticipants,"GROUP_FILEBUFFER", groupName + " " + sUserName + " " + buffer)
+
 
 
     def sendErrorMessage(self, client, errorMessage):

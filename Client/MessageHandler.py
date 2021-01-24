@@ -39,6 +39,11 @@ class MessageHandler():
             self.processFilePathResponse(socket, splittedMessage[1])
         elif(command == 'FILEBUFFER'):
             self.processFileBufferResponse(socket, splittedMessage[1])
+        elif(command == 'GROUP_SEND_FILE_PATH'):
+            self.processGroupFilePathResponse(socket, splittedMessage[1])
+        elif(command == 'GROUP_FILEBUFFER'):
+            self.processGroupFileBufferResponse(socket, splittedMessage[1])
+        
         else:
             self.processMessage(socket, "Unknown response")
 
@@ -98,26 +103,49 @@ class MessageHandler():
 
     def processFilePathResponse(self, socket, argsString):
         args = argsString.split(maxsplit=1)
+        rUserName = sessionInfo.userName
         fileReciever.createFile(args[0], args[1])
         print("Recieving file "+args[1]+" from "+args[0])
 
     def processFileBufferResponse(self, socket, argsString):
-        #args = argsString.split(maxsplit = 1)
-        #sUserName = args[0]
         buffer = argsString
-        
         if(buffer != "EOF"):
             sUserName = fileReciever.sUserName
             fullKey = diffieHellman.fullKeys[sUserName]
             encryptObject = pyDes.triple_des(fullKey, padmode = pyDes.PAD_PKCS5)
             decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(buffer), padmode = pyDes.PAD_PKCS5)
-            buffer =  decryptedMessage.decode(encoding='utf-8') 
-            print(buffer)
+            buffer =  decryptedMessage.decode(encoding='utf-8')
             buffer = binascii.a2b_hex(buffer)
             fileReciever.writeFile(buffer)
         else:
             fileReciever.closeFile()
             self.processMessage(socket, "File Recived, Ready to take input")
+
+    def processGroupFileBufferResponse(self, socket, argsString):
+        args = argsString.split(maxsplit=2)
+        groupName = args[0]
+        #sUserName = args[1]
+        buffer = args[2]
+        if(buffer != "EOF"):
+            #fullKey = diffieHellman.fullKeys[sUserName]
+            #encryptObject = pyDes.triple_des(fullKey, padmode = pyDes.PAD_PKCS5)
+            #decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(buffer), padmode = pyDes.PAD_PKCS5)
+            #buffer =  decryptedMessage.decode(encoding='utf-8') 
+            #print(buffer)
+            buffer = binascii.a2b_hex(buffer)
+            fileReciever.writeFile(buffer)
+        else:
+            fileReciever.closeFile()
+            self.processMessage(socket, "File Recived, Ready to take input")
+    
+    def processGroupFilePathResponse(self, socket, argsString):
+        args = argsString.split(maxsplit=2)
+        groupName = args[0]
+        sUserName = args[1]
+        fileName = args[2]
+        rUserName = sessionInfo.userName
+        fileReciever.createFile(groupName+"/"+rUserName, fileName)
+        print("Recieving file "+fileName+" from "+sUserName+" in "+groupName)
 
         
 
