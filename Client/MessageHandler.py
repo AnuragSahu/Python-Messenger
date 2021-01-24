@@ -3,6 +3,7 @@ from SessionInfo import sessionInfo
 import json
 from DiffieHellman import diffieHellman
 from MessageSender import messageSender
+from FileReciever import fileReciever
 import binascii
 import pyDes
 
@@ -34,6 +35,10 @@ class MessageHandler():
             self.processSenderPartialKeyCommand(socket, splittedMessage[1])
         elif(command == 'RECEIVER_PARTIAL_KEY'):
             self.processReceiverPartialKeyCommand(socket, splittedMessage[1])
+        elif(command == 'SEND_FILE_PATH'):
+            self.processFilePathResponse(socket, splittedMessage[1])
+        elif(command == 'FILEBUFFER'):
+            self.processFileBufferResponse(socket, splittedMessage[1])
         else:
             self.processMessage(socket, "Unknown response")
 
@@ -90,6 +95,31 @@ class MessageHandler():
         decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(message), padmode = pyDes.PAD_PKCS5)
         message =  decryptedMessage.decode(encoding='utf-8') 
         self.processMessage(socket, groupName+": "+sUserName+": "+message)
+
+    def processFilePathResponse(self, socket, argsString):
+        args = argsString.split(maxsplit=1)
+        fileReciever.createFile(args[0], args[1])
+        print("Recieving file "+args[1]+" from "+args[0])
+
+    def processFileBufferResponse(self, socket, argsString):
+        #args = argsString.split(maxsplit = 1)
+        #sUserName = args[0]
+        buffer = argsString
+        
+        if(buffer != "EOF"):
+            sUserName = fileReciever.sUserName
+            fullKey = diffieHellman.fullKeys[sUserName]
+            encryptObject = pyDes.triple_des(fullKey, padmode = pyDes.PAD_PKCS5)
+            decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(buffer), padmode = pyDes.PAD_PKCS5)
+            buffer =  decryptedMessage.decode(encoding='utf-8') 
+            print(buffer)
+            buffer = binascii.a2b_hex(buffer)
+            fileReciever.writeFile(buffer)
+        else:
+            fileReciever.closeFile()
+            self.processMessage(socket, "File Recived, Ready to take input")
+
+        
 
 
 messageHandler = MessageHandler()

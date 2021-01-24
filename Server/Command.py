@@ -11,3 +11,5 @@ class Commands(enum.Enum):
    GROUP_SEND = 1
    SENDER_PARTIAL_KEY = 1
    RECEIVER_PARTIAL_KEY = 1
+   SEND_FILE_PATH = 1
+   FILEBUFFER = 1

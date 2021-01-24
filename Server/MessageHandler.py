@@ -31,6 +31,10 @@ class MessageHandler(object):
             self.processSenderPartialKeyCommand(client, splittedMessage[1].strip())
         elif(command == 'RECEIVER_PARTIAL_KEY'):
             self.processReceiverPartialKeyCommand(client, splittedMessage[1].strip())
+        elif(command == 'SEND_FILE_PATH'):
+            self.processSendFilePathCommand(client, splittedMessage[1].strip())
+        elif(command == 'FILEBUFFER'):
+            self.processFileBufferCommand(client, splittedMessage[1].strip())
         else:
             self.sendErrorMessage(client, "Invalid Command : " + command)
 
@@ -136,14 +140,28 @@ class MessageHandler(object):
         messageSender.broadCast(
             socketOfParticipants,"GROUP_MESSAGE", groupName + " " + sUserName + " " + args[1])
 
+    def processSendFilePathCommand(self, client, argsString):
+        from ClientManager import clientManager
+        args = argsString.split(maxsplit=1)
+        sUserName = clientManager.getClientName(client)
+        rUserName = args[0]
+        rSocket = clientManager.getClient(rUserName)
+        messageSender.send(rSocket, "SEND_FILE_PATH", sUserName+" "+ args[1])
+
+    def processFileBufferCommand(self, client, argsString):
+        from ClientManager import clientManager
+        args = argsString.split(maxsplit = 1)
+        rUserName = args[0]
+        buffer = args[1]
+        rClient = clientManager.getClient(rUserName)
+        messageSender.send(rClient, "FILEBUFFER", buffer)
+
+
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
 
     def sendLoggedInMessage(self, client, userName):
       messageSender.send(client, "LOGIN_SUCCESS", "LoggedIn successfully:: " + userName)
-
-    # def sendGroupCreatedMessage(self, client, groupName):
-    #     messageSender.send(client, "GROUP_CREATED", groupName)
 
     def sendMessage(self, client, senderName, message):
         messageSender.send(client, "MESSAGE", senderName + " " + message)

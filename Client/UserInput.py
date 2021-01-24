@@ -7,6 +7,8 @@ import pyDes
 import time
 import binascii
 
+import Constants
+import socket
 
 
 
@@ -24,15 +26,37 @@ class UserInput(object):
             messageSender.send(socket, argsString + " " + str(publicKey))
         elif(command == "SEND"):
             self.sharePartialKey(socket, argsString.split()[1])
-            time.sleep(10) # 2 sec
-            encryptedMessage =  self.encryptMessage(argsString.split(maxsplit=2)[1:],)
+            time.sleep(2) # 2 sec
+            encryptedMessage =  self.encryptMessage(argsString.split(maxsplit=2)[1:])
             messageSender.send(socket, "SEND " + argsString.split()[1] + " " + encryptedMessage)
+        elif(command == "SEND_FILE"):
+            args = argsString.split(maxsplit = 2)
+            rUserName = args[1]
+            filePath = args[2]
+            fileName = filePath.split("/")[-1]
+            self.sharePartialKey(socket, rUserName)
+            time.sleep(2) # 2 sec
+            messageSender.send(socket, "SEND_FILE_PATH " + rUserName + " " + fileName)
+            time.sleep(1) # 1s
+            self.sendFile(socket, rUserName, filePath)
         elif(command == "GROUP_SEND"):
             groupName, message =  argsString.split(maxsplit=2)[1:]
             encryptedMessage = self.encryptGroupMessage(groupName, message)
             messageSender.send(socket, "GROUP_SEND " + groupName + " " + encryptedMessage)
         else:
             messageSender.send(socket, argsString)
+
+    def sendFile(self, client, rUserName, filePath):
+        f = open(filePath,'rb')
+        l = f.read(Constants.FILE_BUFFER)
+        while(l):
+            l = binascii.b2a_hex(l).decode(encoding='utf-8')
+            l = self.encryptMessage([rUserName,l])
+            messageSender.send(client, "FILEBUFFER " + rUserName + " " + l)
+            l = f.read(Constants.FILE_BUFFER)
+            time.sleep(1) #1s
+        f.close()
+        messageSender.send(client, "FILEBUFFER "+rUserName+" EOF")
 
     def generateKeys(self):
         # TODO
