@@ -26,6 +26,8 @@ class MessageHandler():
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_JOIN'):
             self.processGroupJoinSuccessResponse(socket, splittedMessage[1])
+        elif(command == 'GROUP_MESSAGE'):
+            self.processGroupMessageResponse(socket, splittedMessage[1])
         elif(command == 'PUBLIC_KEYS'):
             self.processPublicKeysResponse(socket, splittedMessage[1])
         elif(command == 'SENDER_PARTIAL_KEY'):
@@ -73,6 +75,13 @@ class MessageHandler():
         sUserName, key = argsString.split()
         diffieHellman.addFullKey(
             sUserName, key, sessionInfo.publicKeys[sUserName], sessionInfo.privateKey)
+
+    def processGroupMessageResponse(self, socket, argsString):
+        args = argsString.split(maxsplit = 2)
+        groupName  = args[0]
+        sUserName = args[1]
+        message = args[2]
+        self.processMessage(socket, groupName+": "+sUserName+": "+message)
 
 
 messageHandler = MessageHandler()

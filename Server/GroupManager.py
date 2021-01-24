@@ -10,12 +10,14 @@ class GroupManager(object):
 
     def createGroup(self, userName, groupName):
         self.groups[groupName] = [userName]
-        print(self.groups)
+        #print(self.groups)
     
     def joinGroup(self, userName, groupName):
-        self.groups[groupName].append(userName)
-        print(self.groups)
-
+        if(groupName not in self.groups.keys()):
+            self.createGroup(userName, groupName)
+        else:
+            self.groups[groupName].append(userName)
+        #print(self.groups)
 
     def listGroup(self):
         groups_information = {}
@@ -23,5 +25,8 @@ class GroupManager(object):
             groups_information[i] = len(self.groups[i])
 
         return groups_information
+
+    def getParticipants(self, groupName):
+        return self.groups[groupName]
 
 groupManager = GroupManager()

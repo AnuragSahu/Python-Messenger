@@ -8,5 +8,6 @@ class Commands(enum.Enum):
    JOIN = 1
    LIST = 0
    PARTIAL_KEY = 1
+   GROUP_SEND = 1
    SENDER_PARTIAL_KEY = 1
    RECEIVER_PARTIAL_KEY = 1

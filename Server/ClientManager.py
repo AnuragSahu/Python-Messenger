@@ -23,6 +23,12 @@ class ClientManager(object):
     def getClient(self, userName):
         return self.clients[userName]
 
+    def getClients(self, userNames):
+        socketList = []
+        for userName in userNames:
+            socketList.append(self.clients[userName])
+        return socketList
+
     def getAllClients(self):
         return self.clients.values()
 

@@ -25,6 +25,8 @@ class MessageHandler(object):
             self.processListCommand(client)
         elif(command == 'JOIN'):
             self.processJoinCommand(client, splittedMessage[1].strip())
+        elif(command == 'GROUP_SEND'):
+            self.processGroupSendCommand(client, splittedMessage[1].strip())
         elif(command == 'SENDER_PARTIAL_KEY'):
             self.processSenderPartialKeyCommand(client, splittedMessage[1].strip())
         elif(command == 'RECEIVER_PARTIAL_KEY'):
@@ -121,6 +123,18 @@ class MessageHandler(object):
         sUserName = clientManager.getClientName(sClient)
         rClient = clientManager.getClient(rUserName)
         messageSender.send(rClient, "RECEIVER_PARTIAL_KEY", sUserName + " " + key)
+
+    def processGroupSendCommand(self, client, argsString):
+        from GroupManager import groupManager
+        from ClientManager import clientManager
+        args = argsString.split(maxsplit = 1)
+        groupName = args[0]
+        sUserName = clientManager.getClientName(client)
+        listOfParticipants = groupManager.getParticipants(groupName)
+        socketOfParticipants = clientManager.getClients(listOfParticipants)
+        socketOfParticipants.remove(client)
+        messageSender.broadCast(
+            socketOfParticipants,"GROUP_MESSAGE", groupName + " " + sUserName + " " + args[1])
 
     def sendErrorMessage(self, client, errorMessage):
         messageSender.sendError(client, errorMessage)
