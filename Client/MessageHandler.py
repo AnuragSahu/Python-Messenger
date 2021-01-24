@@ -9,7 +9,7 @@ import pyDes
 
 class MessageHandler():
     def handle_message(self, socket, message):
-        print("Recieved : " + message)
+        #print("Recieved : " + message)
         splittedMessage = message.split(maxsplit=1)
         command = splittedMessage[0]
         if(command == 'GREETING'):

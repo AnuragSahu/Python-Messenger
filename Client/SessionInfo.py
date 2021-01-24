@@ -18,7 +18,7 @@ class SessionInfo(object):
     def setPublicKeys(self, keys):
         for key in keys:
             self.publicKeys[key] = int(keys[key])
-        print(self.publicKeys)
+        #print(self.publicKeys)
 
     def setSocket(self, socket):
         self.socket = socket

@@ -8,7 +8,7 @@ import time
 class MessageHandler(object):
 
     def handle_message(self, client, message):
-        print("Recieved : " + message)
+        #print("Recieved : " + message)
         splittedMessage = message.split(maxsplit=1)
         command = splittedMessage[0]
         if(len(splittedMessage) < Commands[command].value + 1):

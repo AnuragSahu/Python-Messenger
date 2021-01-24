@@ -11,20 +11,17 @@ class DiffieHellman(object):
         partialKey = myPublicKey ** privateKey
         partialKey = partialKey % publicKeys[rUserName]
         self.partialKeys[rUserName] = partialKey
-        print("Partial keys: ", self.partialKeys)
 
     def updatePartialKey(self, privateKey, publicKeys, userName, sUserName):
         sPublicKey = publicKeys[sUserName]
         partialKey = sPublicKey ** privateKey
         partialKey = partialKey % publicKeys[userName]
         self.partialKeys[sUserName] = partialKey
-        print("Partial keys: ", self.partialKeys)
 
     def addFullKey(self, sUserName, sPartialKey, sPublicKey, privateKey):
         fullKey = int(sPartialKey) ** privateKey
         fullKey = fullKey % sPublicKey
         self.fullKeys[sUserName] = unhex(self.ensurelength(str(hex(fullKey))[2:]))
-        print("Full keys: ", self.fullKeys)
 
     def ensurelength(self, key):
         if(len(key)  <= 48):

@@ -21,7 +21,6 @@ class UserInput(object):
         if(command == "SIGNUP"):
             publicKey, privateKey = self.generateKeys()
             sessionInfo.setKeys(publicKey, privateKey)
-            #print(publicKey, privateKey)
             messageSender.send(socket, message + " " + str(publicKey))
         elif(command == "SEND"):
             self.sharePartialKey(socket, message.split()[1])
