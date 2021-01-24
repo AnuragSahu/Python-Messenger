@@ -1,3 +1,5 @@
+import binascii
+
 class SessionInfo(object):
     def __init__(self):
         self.socket = None
@@ -6,6 +8,7 @@ class SessionInfo(object):
         self.publickey = 0
         self.privateKey = 0
         self.publicKeys = {}
+        self.groupKeys = {}
 
     def updateLoggedInStatus(self, loggedIn, userName):
         self.isLoggedIn = loggedIn
@@ -22,5 +25,9 @@ class SessionInfo(object):
 
     def setSocket(self, socket):
         self.socket = socket
+
+    def joinGroup(self, groupName, groupKey):
+        groupKey = binascii.a2b_hex(groupKey)
+        self.groupKeys[groupName] = groupKey
 
 sessionInfo = SessionInfo()

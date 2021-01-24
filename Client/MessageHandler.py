@@ -21,7 +21,7 @@ class MessageHandler():
         elif(command == 'MESSAGE'):
             self.processRecievedMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_CREATED'):
-            self.processMessage(socket, splittedMessage[1])
+            self.processGroupJoinSuccessResponse(socket, splittedMessage[1])
         elif(command == 'GROUP_LIST'):
             self.processMessage(socket, splittedMessage[1])
         elif(command == 'GROUP_JOIN'):
@@ -42,7 +42,11 @@ class MessageHandler():
         print(argsString)
 
     def processGroupJoinSuccessResponse(self, socket, argsString):
-        self.processMessage(socket, argsString)
+        args = argsString.split(maxsplit=1)
+        groupKey = args[1]
+        groupName = args[0]
+        sessionInfo.joinGroup(groupName, groupKey)
+        self.processMessage(socket, "Successfully Joined : "+groupName)
 
     def processMessage(self, socket, argsString):
         print(argsString)
@@ -81,6 +85,10 @@ class MessageHandler():
         groupName  = args[0]
         sUserName = args[1]
         message = args[2]
+        groupKey = sessionInfo.groupKeys[groupName]
+        encryptObject = pyDes.triple_des(groupKey, padmode = pyDes.PAD_PKCS5)
+        decryptedMessage = encryptObject.decrypt(binascii.a2b_hex(message), padmode = pyDes.PAD_PKCS5)
+        message =  decryptedMessage.decode(encoding='utf-8') 
         self.processMessage(socket, groupName+": "+sUserName+": "+message)
 
 

@@ -15,20 +15,24 @@ class UserInput(object):
     def takeUserInput(self, socket):
         KeyboardThread(self.processInput)
         
-    def processInput(self, message):
+    def processInput(self, argsString):
         socket = sessionInfo.socket
-        command = message.split(maxsplit=1)[0]
+        command = argsString.split(maxsplit=1)[0]
         if(command == "SIGNUP"):
             publicKey, privateKey = self.generateKeys()
             sessionInfo.setKeys(publicKey, privateKey)
-            messageSender.send(socket, message + " " + str(publicKey))
+            messageSender.send(socket, argsString + " " + str(publicKey))
         elif(command == "SEND"):
-            self.sharePartialKey(socket, message.split()[1])
+            self.sharePartialKey(socket, argsString.split()[1])
             time.sleep(10) # 2 sec
-            encryptedMessage =  self.encryptMessage(message.split(maxsplit=2)[1:],)
-            messageSender.send(socket, "SEND " + message.split()[1] + " " + encryptedMessage)
+            encryptedMessage =  self.encryptMessage(argsString.split(maxsplit=2)[1:],)
+            messageSender.send(socket, "SEND " + argsString.split()[1] + " " + encryptedMessage)
+        elif(command == "GROUP_SEND"):
+            groupName, message =  argsString.split(maxsplit=2)[1:]
+            encryptedMessage = self.encryptGroupMessage(groupName, message)
+            messageSender.send(socket, "GROUP_SEND " + groupName + " " + encryptedMessage)
         else:
-            messageSender.send(socket, message)
+            messageSender.send(socket, argsString)
 
     def generateKeys(self):
         # TODO
@@ -57,6 +61,12 @@ class UserInput(object):
         encryptedMessage = encryptObject.encrypt(message, padmode = pyDes.PAD_PKCS5)
         return binascii.b2a_hex(encryptedMessage).decode(encoding='utf-8') 
         #return encryptedMessage 
+
+    def encryptGroupMessage(self, groupName, message):
+        key = sessionInfo.groupKeys[groupName]
+        encryptObject = pyDes.triple_des(key, padmode = pyDes.PAD_PKCS5)
+        encryptedMessage = encryptObject.encrypt(message, padmode = pyDes.PAD_PKCS5)
+        return binascii.b2a_hex(encryptedMessage).decode(encoding='utf-8') 
 
         
 

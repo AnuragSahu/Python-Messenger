@@ -90,8 +90,8 @@ class MessageHandler(object):
         from ClientManager import clientManager
         groupName = argsString
         senderName = clientManager.getClientName(client)
-        groupManager.createGroup(senderName, groupName)
-        self.sendGroupCreatedMessage(client, groupName)
+        groupKey = groupManager.createGroup(senderName, groupName)
+        self.sendGroupJoinMessage(client, groupName, groupKey)
 
     def processListCommand(self, client):
         from GroupManager import groupManager
@@ -107,8 +107,8 @@ class MessageHandler(object):
         from ClientManager import clientManager
         groupName = argsString
         userName = clientManager.getClientName(client)
-        groupManager.joinGroup(userName, groupName)
-        self.sendGroupJoinMessage(client, groupName)
+        groupKey = groupManager.joinGroup(userName, groupName)
+        self.sendGroupJoinMessage(client, groupName, groupKey)
             
     def processSenderPartialKeyCommand(self, sClient, argsString):
         from ClientManager import clientManager
@@ -142,8 +142,8 @@ class MessageHandler(object):
     def sendLoggedInMessage(self, client, userName):
       messageSender.send(client, "LOGIN_SUCCESS", "LoggedIn successfully:: " + userName)
 
-    def sendGroupCreatedMessage(self, client, groupName):
-        messageSender.send(client, "GROUP_CREATED", "Group created successfully:: " + groupName)
+    # def sendGroupCreatedMessage(self, client, groupName):
+    #     messageSender.send(client, "GROUP_CREATED", groupName)
 
     def sendMessage(self, client, senderName, message):
         messageSender.send(client, "MESSAGE", senderName + " " + message)
@@ -151,7 +151,7 @@ class MessageHandler(object):
     def sendGroupList(self, client, group_list):
         messageSender.send(client, "GROUP_LIST", group_list)
 
-    def sendGroupJoinMessage(self, client, groupName):
-        messageSender.send(client, "GROUP_JOIN", "Succesfully joint group: " + groupName)
+    def sendGroupJoinMessage(self, client, groupName, groupKey):
+        messageSender.send(client, "GROUP_JOIN", groupName+" "+groupKey)
 
 messageHandler = MessageHandler()
