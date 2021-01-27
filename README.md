@@ -1,33 +1,21 @@
 # Python-Messenger
 
-Commands to implement:
+Commands implemented:
 
-SIGNUP -> uName
-		  pwd
+SIGNUP -> uName pwd
 
-SIGNIN -> uName
-		  pwd
+SIGNIN -> uName pwd
 
-SEND -> uName/groupName
-		Message
+SEND -> uName Message
 
-SIGNIN_ERROR -> error_message
+SEND_FILE -> uName file_path
 		
-MESSAGE -> message
-		   sender
+GROUP_SEND -> groupName Message
+
+GROUP_SEND_FILE -> groupName file_path
 
 CREATE -> GROUP_NAME <- Key
 
 JOIN -> GROUP_NAME <- Key
 
 LIST
-
-KEY -> GROUP_NAME
-	   key
-
-GROUP_LIST -> groups
-		      participants
-
-
-
-ERROR -> error_message
