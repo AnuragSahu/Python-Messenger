@@ -103,8 +103,9 @@ class MessageHandler():
 
     def processFilePathResponse(self, socket, argsString):
         args = argsString.split(maxsplit=1)
-        rUserName = sessionInfo.userName
-        fileReciever.createFile(rUserName, args[1])
+        sUserName = args[0]
+        #rUserName = sessionInfo.userName
+        fileReciever.createFile(sUserName, args[1])
         print("Recieving file "+args[1]+" from "+args[0])
 
     def processFileBufferResponse(self, socket, argsString):
